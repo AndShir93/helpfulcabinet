@@ -1,0 +1,92 @@
+@startuml model
+
+package "Отношения" {
+  
+  class User<<Пользователь>>{
+    + code
+    + name
+  }
+
+  class Relation <<Отношение>>{
+    + uid
+    + code
+    + name
+  }
+
+  class RelationMemberRole <<Роль>>{
+    + code
+    + name
+  }
+
+  RelationMember .. "1" RelationMemberRole
+
+  class RelationMember<<Участник отношения>> {
+    user: User
+    relation: Relation
+    role: RelationMemberRole <<Роль>>
+    begDate: DateTime
+    endDate: DateTime
+  }
+
+  User "1" *-- "M" RelationMember : содержит >
+  Relation "1" *-- "M" RelationMember : содержит >
+}
+
+package "Контакты" {
+  class Session <<Контакт>>{
+    + uid
+    + begDate
+    + direction
+    + relation: Relation
+  }
+
+  class Event <<Событие>>{
+    + date
+    + content
+    + relationMember
+  }
+  Session "1" *-- "M" Event : содержит >
+
+}
+
+package "Сделки" {
+  class ProductCart <<Корзина>> {
+    uid
+    createdBy: User
+  }      
+  class ProductOffer <<Оферта>> {
+    amount <<Стоимость>>
+    product: Product
+    good: Good
+  }
+  ProductCart "1" *-- "M" ProductOffer : содержит >
+
+  class Product <<Продукт>> {
+    code
+    name
+  }
+  note right of Product
+    Продукт или услуга
+    Это может быть отовар
+    (недвижимость, авто)
+    или услуга "Страховка",
+    "Оценка" и т.д.
+  end note
+
+  ProductOffer .. "1" Product
+  ProductOffer .. "1" Good
+
+  class Good <<Товар>> {
+    code
+    name
+    data
+  }
+
+  note right of Good
+    Информация о конкретном
+    товаре (недвижимости, 
+    авто и т.дю)
+  end note
+
+}
+@enduml

@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum RelationType {
+  ORG
+}
+
+// Отношение - организация, сделка и т.д.
+// Структура предлагается как модель организации прав отдельно от объектов учета
+//  - организацией, сделкой и т.п.
+// Однако можно не использовать данную абстракцию, если
+// удобнее напрямую связывать пользователей с объектами учета
+model Relation {
+  id             Int              @id @default(autoincrement())
+  code           String           @unique
+  name           String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  type           RelationType     @default(ORG)
+  parent         Relation?        @relation("RelationToRelation", fields: [parentId], references: [id])
+  relations      Relation[]       @relation("RelationToRelation")
+  RelationMember RelationMember[]
+  parentId       Int?
+}
+
+// Пользователь
+model User {
+  id             Int              @id @default(autoincrement())
+  code           String           @unique
+  name           String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  RelationMember RelationMember[]
+}
+
+// Роль участника отношения
+model RelationMemberRole {
+  id             Int              @id @default(autoincrement())
+  code           String           @unique
+  name           String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  RelationMember RelationMember[]
+}
+
+// Участник отношения
+// TODO: добавить begDate / endDate
+// Пользователь связывается с организацией ролью
+// Например, владелец, риэлтор и т.д.
+model RelationMember {
+  id         Int                @id @default(autoincrement())
+  user       User               @relation(fields: [userId], references: [id])
+  userId     Int
+  relation   Relation           @relation(fields: [relationId], references: [id])
+  relationId Int
+  role       RelationMemberRole @relation(fields: [roleId], references: [id])
+  roleId     Int
+
+  @@unique([userId, roleId, relationId])
+}
+
+// Универсальный справочник
+model Dictionary {
+  id         Int          @id @default(autoincrement())
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime?    @updatedAt
+  code       String?      @db.VarChar(100)
+  name       String?      @db.VarChar(255)
+  externId   Int?
+  parent     Dictionary?  @relation("dictionaryParent", fields: [parentId], references: [id])
+  categories Dictionary[] @relation("dictionaryParent")
+  parentId   Int?
+
+  @@unique([parentId, code, name])
+}

@@ -1,0 +1,58 @@
+@font-face {
+font-family: 'Solomon';
+src: local('Solomon Book'), local('Solomon-Book'),
+    url('../public/Solomon-Sans-Book.woff') format('woff');
+font-weight: 300;
+font-style: normal;
+}
+.contacts{
+    display: flex;
+    justify-content: space-between;
+    padding: 30px 0;
+}
+.item{
+    display: flex;
+    flex-direction: column ;
+}
+.infoItem{
+    display: flex;
+    align-items: baseline;
+}
+.text{
+    font-family: 'Solomon';
+    font-weight: 300;
+    font-size: 1.5rem;
+    color: #49b863;
+}
+.text_uppercase{
+    text-transform: uppercase;
+}
+.social{
+    display: flex;
+    padding: 1rem 0;
+    gap: 30px;
+}
+@media (max-width: 767px){
+    .contacts{
+        flex-direction: column-reverse;
+    }
+    .item{
+        display: flex;
+        flex-direction: row;
+    }
+    .social{
+        flex-basis: 68px;
+        flex-direction: column;
+        padding: 0;
+        margin: 0 10px 0 0;
+        flex-shrink: 0;
+    }
+    .logo{
+        width: 65px;
+        float: left;
+        margin: 0 10px 0 0;
+    }
+    .text{
+        font-size: 1rem;
+    }
+}
